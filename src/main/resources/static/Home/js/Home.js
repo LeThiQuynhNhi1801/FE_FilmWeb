@@ -3,6 +3,7 @@ var historyUserLogin=[];
 var prevs;
 var nexts;
 var demCategory=0;
+const domain = "http://127.0.0.1:8080";
 
 if(localStorage.getItem("Token")){
     
@@ -46,7 +47,7 @@ function GetChapterRecommend(){
         }
     }         
     //khai báo phương thức và đường dẫn để request
-    xhttp.open("GET", "/ApiV1/Recommend",false);
+    xhttp.open("GET", domain+"/ApiV1/Recommend",false);
     //định dạng gửi đi787
     xhttp.setRequestHeader("Content-type","application/json")
     token = localStorage.getItem("Token");
@@ -82,7 +83,7 @@ function GetHistoryUserLogin(){
         }
     }         
     //khai báo phương thức và đường dẫn để request
-    xhttp.open("GET", "/ApiV1/HistoryUserLogin",false);
+    xhttp.open("GET", domain+"/ApiV1/HistoryUserLogin",false);
     //định dạng gửi đi787
     xhttp.setRequestHeader("Content-type","application/json")
     token = localStorage.getItem("Token");
@@ -177,12 +178,12 @@ function GetCategoryFilmList(){
             }
         }
         else if(xhttp.status==403){
-            localStorage.removeItem("Token");
-            window.location="/Login"
+            // localStorage.removeItem("Token");
+            // window.location="/Login"
         }
     }         
     //khai báo phương thức và đường dẫn để request
-    xhttp.open("GET", "/ApiV1/CategoryAllFim",false);
+    xhttp.open("GET", domain+"/ApiV1/CategoryAllFim",false);
     //định dạng gửi đi787
     xhttp.setRequestHeader("Content-type","application/json")
     token = localStorage.getItem("Token");
@@ -203,7 +204,7 @@ function GetHotChapter(){
            
             var ChapterHotElement = document.getElementById('ChapterHot');
             var ChapterHotHtml='';
-            ChapterHotHtml+='<div class="movieHots__movie__content" id="movie__hotFirst"><div class="movie__content__img"><img src="'+ChapterHot.chapterImage +'" alt=""></div><div class="movie__content__video"><video src="'+ChapterHot.trailerChapter+'" autoplay="true" muted="true"></video></div></div><div class="movieHots__movie__body"><div class="movie__body__aboutMovie"><div class="aboutMovie__imgName"><img src="'+ChapterHot.film.bannerFilmName+'" alt=""></div><div class="aboutMovie__des"><h1>Xem ngay mùa 2</h1><p>'+ChapterHot.chapterDescription+'</p></div><div class="aboutMovie__action"><a href="/DetailVideo/'+ChapterHot.id+'" class="aboutMovie__action__play"><button><i class="fa-solid fa-play"></i> Play</button></a><button class="aboutMovie__action__infor"><i class="fa-solid fa-circle-info"></i> Thông tin khác</button></div></div></div>';
+            ChapterHotHtml+='<div class="movieHots__movie__content" id="movie__hotFirst"><div class="movie__content__img"><img src="'+ChapterHot.chapterImage +'" alt=""></div><div class="movie__content__video"><video src="'+ChapterHot.trailerChapter+'" autoplay="true" muted="true"></video></div></div><div class="movieHots__movie__body"><div class="movie__body__aboutMovie"><div class="aboutMovie__imgName"><img src="'+ChapterHot.film.chapterImage+'" alt=""></div><div class="aboutMovie__des"><h1>Xem ngay mùa 2</h1><p>'+ChapterHot.chapterDescription+'</p></div><div class="aboutMovie__action"><a href="/DetailVideo/'+ChapterHot.id+'" class="aboutMovie__action__play"><button><i class="fa-solid fa-play"></i> Play</button></a><button class="aboutMovie__action__infor"><i class="fa-solid fa-circle-info"></i> Thông tin khác</button></div></div></div>';
             ChapterHotElement.innerHTML = ChapterHotHtml;
             
         }
@@ -213,7 +214,7 @@ function GetHotChapter(){
         }
     }         
     //khai báo phương thức và đường dẫn để request
-    xhttp.open("GET", "/ApiV1/ChapterHot",false);
+    xhttp.open("GET", domain+"/ApiV1/ChapterHot",false);
     //định dạng gửi đi787
     xhttp.setRequestHeader("Content-type","application/json")
     token = localStorage.getItem("Token");
@@ -391,7 +392,7 @@ function Search(){
             }
         }         
         //khai báo phương thức và đường dẫn để request
-        xhttp.open("GET", "/ApiV1/FindFilm/"+searchFilmValue,false);
+        xhttp.open("GET", domain+"/ApiV1/FindFilm/"+searchFilmValue,false);
         //định dạng gửi đi787
         xhttp.setRequestHeader("Content-type","application/json")
         token = localStorage.getItem("Token");

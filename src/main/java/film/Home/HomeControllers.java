@@ -10,6 +10,10 @@ public class HomeControllers {
         public String hello() {
             return "Home/Login";
         }
+    @GetMapping("/play")
+    public String play() {
+        return "Home/video";
+    }
         @GetMapping("/Home")
         public String home() {
         return "Home/Home";

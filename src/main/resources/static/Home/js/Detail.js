@@ -1,12 +1,13 @@
 var rating=0;
 var watchedTime=0;
+const domain = "http://127.0.0.1:8080"
 if(localStorage.getItem("Token")){
 
     GetHistoryByChapterIDAndUserLogin();
     GetChapterListByChapterID();
 }
 else{
-    window.location="/Login";
+    // window.location="/Login";
 }
 
 function GetHistoryByChapterIDAndUserLogin(){
@@ -41,17 +42,17 @@ function GetHistoryByChapterIDAndUserLogin(){
         }
         else if(xhttp.status=401)
         {
-            localStorage.removeItem("Token");
-            window.location="/Login";
+            // localStorage.removeItem("Token");
+            // window.location="/Login";
         }
         else if(xhttp.status=403)
         {
-            localStorage.removeItem("Token");
-            window.location="/Login";
+            // localStorage.removeItem("Token");
+            // window.location="/Login";
         }
     }         
     //khai báo phương thức và đường dẫn để request
-    xhttp.open("GET", "/ApiV1/HistoryByChapterIDAndUserLogin/"+window.location.pathname.substring(13),false);
+    xhttp.open("GET", domain+"/ApiV1/HistoryByChapterIDAndUserLogin/"+window.location.pathname.substring(13),false);
     //định dạng gửi đi787
     xhttp.setRequestHeader("Content-type","application/json")
     token = localStorage.getItem("Token");
@@ -82,7 +83,8 @@ function GetChapterListByChapterID(){
                 
                 if(CategoryList[i].id== parseInt(window.location.pathname.substring(13))){
                     CategoryFilmListHtml+='class="selectedChapter"';
-                    CategoryFilmHtml+=' <video src="'+CategoryList[i].video+'" autoplay ></video>';
+                    CategoryFilmHtml+=' <video id="videoPlayer" width="640" height="360" controls>'
+                        +'<source src="'+CategoryList[i].video+'" type="video/mp4"></video>';
                     CategoryFilmNameHtml+='<p>Tập'+CategoryList[i].chapterNumber+' :<span>'+CategoryList[i].chapterName+'</span></p>';
                 }
                 CategoryFilmListHtml+='><div class="ChapterDetail__header"><p>'+(i+1)+' <span>'+CategoryList[i].chapterName+'</span></p></div><div class="ChapterDetail__content"><div class="ChapterDetail__content__img"><a href="/DetailVideo/'+CategoryList[i].id+'"><img src="'+CategoryList[i].chapterImage+'" alt=""></a></div><div class="ChapterDetail__content__Des"><p>'+CategoryList[i].chapterDescription+'</p></div></div></li>';
@@ -90,23 +92,23 @@ function GetChapterListByChapterID(){
             CategoryFilmListHtml+='</ul></div>';
             CategoryFilmElement.innerHTML = CategoryFilmHtml;
             console.log(watchedTime);
-            CategoryFilmElement.querySelector('video').currentTime=watchedTime;
+            // CategoryFilmElement.querySelector('video').currentTime=watchedTime;
             CategoryFilmNameElement.innerHTML=CategoryFilmNameHtml;
             CategoryFilmListElement.innerHTML=CategoryFilmListHtml;
         }
         else if(xhttp.status==401)
         {
-            localStorage.removeItem("Token");
-            window.location="/Login";
+            // localStorage.removeItem("Token");
+            // window.location="/Login";
         }
         else if(xhttp.status==403)
         {
-            localStorage.removeItem("Token");
-            window.location="/Login";
+            // localStorage.removeItem("Token");
+            // window.location="/Login";
         }
     }         
     //khai báo phương thức và đường dẫn để request
-    xhttp.open("GET", "/ApiV1/FilmChapterIDChapterID/"+window.location.pathname.substring(13),false);
+    xhttp.open("GET", domain+"/ApiV1/FilmChapterIDChapterID/"+window.location.pathname.substring(13),false);
     //định dạng gửi đi787
     xhttp.setRequestHeader("Content-type","application/json")
     token = localStorage.getItem("Token");
@@ -124,17 +126,17 @@ function PostHistoryByChapterIDAndUserLogin(){
         }
         else if(xhttp.status=401)
         {
-            localStorage.removeItem("Token");
-            window.location="/Login";
+            // localStorage.removeItem("Token");
+            // window.location="/Login";
         }
         else if(xhttp.status=403)
         {
-            localStorage.removeItem("Token");
-            window.location="/Login";
+            // localStorage.removeItem("Token");
+            // window.location="/Login";
         }
     }         
 
-    xhttp.open("POST", "/ApiV1/HistoryByChapterIDAndUserLogin/"+window.location.pathname.substring(13),false);
+    xhttp.open("POST", domain+"/ApiV1/HistoryByChapterIDAndUserLogin/"+window.location.pathname.substring(13),false);
     //định dạng gửi đi787
     xhttp.setRequestHeader("Content-type","application/json")
     token = localStorage.getItem("Token");
@@ -153,20 +155,20 @@ function ChangeRateHistoryByChapterIDAndUserLogin(){
         }
         else if(xhttp.status=401)
         {
-            localStorage.removeItem("Token");
-            window.location="/Login";
+            // localStorage.removeItem("Token");
+            // window.location="/Login";
         }
         else if(xhttp.status=403)
         {
-            localStorage.removeItem("Token");
-            window.location="/Login";
+            // localStorage.removeItem("Token");
+            // window.location="/Login";
         }
     }         
     const historydata ={
         rate:rating
     }
     historydataJson = JSON.stringify(historydata);
-    xhttp.open("PATCH", "/ApiV1/HistoryByChapterIDAndUserLogin/"+window.location.pathname.substring(13),false);
+    xhttp.open("PATCH", domain+"/ApiV1/HistoryByChapterIDAndUserLogin/"+window.location.pathname.substring(13),false);
     //định dạng gửi đi787
     xhttp.setRequestHeader("Content-type","application/json")
     token = localStorage.getItem("Token");
@@ -185,20 +187,20 @@ function ChangewatchedTimeHistoryByChapterIDAndUserLogin(){
         }
         else if(xhttp.status=401)
         {
-            localStorage.removeItem("Token");
-            window.location="/Login";
+            // localStorage.removeItem("Token");
+            // window.location="/Login";
         }
         else if(xhttp.status=403)
         {
-            localStorage.removeItem("Token");
-            window.location="/Login";
+            // localStorage.removeItem("Token");
+            // window.location="/Login";
         }
     }         
     const historydata ={
         watchedTime:watchedTime
     }
     historydataJson = JSON.stringify(historydata);
-    xhttp.open("PATCH", "/ApiV1/HistoryByChapterIDAndUserLogin/"+window.location.pathname.substring(13),false);
+    xhttp.open("PATCH", domain+"/ApiV1/HistoryByChapterIDAndUserLogin/"+window.location.pathname.substring(13),false);
     //định dạng gửi đi787
     xhttp.setRequestHeader("Content-type","application/json")
     token = localStorage.getItem("Token");
@@ -258,123 +260,123 @@ function outRating(e) {
         }
     }
 }
-//video load
-var videoTimeNow = document.querySelector('.video__option__timeLoad .video__option__timeNow');
-var video = document.querySelector('.container__video video');
-var videoTime = document.querySelector('.container__video__option .video__option__time');
-checkTimeLoad(video.buffered.length);
-function checkTimeLoad(buffere)
-{
-    
-    if(buffere>0)
-    {
-        document.getElementById('loading').style.display='none';
-    }
-    else{
-        document.getElementById('loading').style.display='block';
-    }
-}
-var videoTimeLoad =document.querySelector('.video__option__time .video__option__timeLoad');
-video.addEventListener('progress',()=>
-{
-    if(video.buffered.length>0)
-    {
+// //video load
+// var videoTimeNow = document.querySelector('.video__option__timeLoad .video__option__timeNow');
+// var video = document.querySelector('.container__video video');
+// var videoTime = document.querySelector('.container__video__option .video__option__time');
+// checkTimeLoad(video.buffered.length);
+// function checkTimeLoad(buffere)
+// {
+//
+//     if(buffere>0)
+//     {
+//         document.getElementById('loading').style.display='none';
+//     }
+//     else{
+//         document.getElementById('loading').style.display='block';
+//     }
+// }
+// var videoTimeLoad =document.querySelector('.video__option__time .video__option__timeLoad');
+// video.addEventListener('progress',()=>
+// {
+//     if(video.buffered.length>0)
+//     {
+//
+//         videoTimeLoad.style.width = (video.buffered.end(video.buffered.length-1)/video.duration)*video.videoWidth +'px';
+//     }
+//
+// })
+// video.addEventListener('timeupdate',()=>{
+//     console.log(watchedTime)
+//     if(Math.abs(video.currentTime-watchedTime)>=2){
+//         watchedTime=video.currentTime;
+//         ChangewatchedTimeHistoryByChapterIDAndUserLogin();
+//     }
+//
+//     checkTimeLoad(video.buffered.length);
+//     if(video.currentTime===video.duration){
+//         document.querySelector('.video__listIcon__icon.pause-play').innerHTML='<i class="icon-pause"><i>';
+//     }
+//     videoTimeNow.style.width = (video.currentTime/video.duration)*videoTime.offsetWidth +'px';
+//
+// })
 
-        videoTimeLoad.style.width = (video.buffered.end(video.buffered.length-1)/video.duration)*video.videoWidth +'px';
-    }
-    
-})
-video.addEventListener('timeupdate',()=>{
-    console.log(watchedTime)
-    if(Math.abs(video.currentTime-watchedTime)>=2){
-        watchedTime=video.currentTime;
-        ChangewatchedTimeHistoryByChapterIDAndUserLogin();
-    }
-   
-    checkTimeLoad(video.buffered.length);
-    if(video.currentTime===video.duration){
-        document.querySelector('.video__listIcon__icon.pause-play').innerHTML='<i class="icon-pause"><i>';
-    }
-    videoTimeNow.style.width = (video.currentTime/video.duration)*videoTime.offsetWidth +'px';
-   
-})
+// videoTime.addEventListener('click',(event)=>
+// {
+//     var element = event.target || event.srcElement;
+//
+//     var b=event.clientX/videoTime.offsetWidth*video.duration;
+//     video.currentTime=b;
+//
+// });
 
-videoTime.addEventListener('click',(event)=>
-{
-    var element = event.target || event.srcElement;
-    
-    var b=event.clientX/videoTime.offsetWidth*video.duration;
-    video.currentTime=b;
-   
-});
+// document.querySelector('.video__listIcon__icon.pause-play').addEventListener("click",()=>
+// {
+//     var element =document.querySelector('.video__listIcon__icon.pause-play');
+//     if(video.paused)
+//     {
+//         video.play();
+//         element.innerHTML='<div class="icon__detail"><i class="icon-play"><i></div>';
+//     }
+//     else{
+//         video.pause();
+//         element.innerHTML='<div class="icon__detail"><i class="icon-pause"><i></div>';
+//     }
+// })
+// document.querySelector('.video__listIcon__icon.prevTenSecond').addEventListener('click',()=>{
+//     if(video.currentTime<10){
+//         video.currentTime=0;
+//     }else{
+//         video.currentTime-=10;
+//     }
+// })
+// document.querySelector('.video__listIcon__icon.nextTenSecond').addEventListener('click',()=>{
+//     if(video.duration -video.currentTime<10){
+//         video.currentTime=video.duration;
+//     }else{
+//         video.currentTime+=10;
+//     }
+// })
 
-document.querySelector('.video__listIcon__icon.pause-play').addEventListener("click",()=>
-{
-    var element =document.querySelector('.video__listIcon__icon.pause-play');
-    if(video.paused)
-    {
-        video.play();
-        element.innerHTML='<div class="icon__detail"><i class="icon-play"><i></div>';
-    }
-    else{
-        video.pause();
-        element.innerHTML='<div class="icon__detail"><i class="icon-pause"><i></div>';
-    }
-})
-document.querySelector('.video__listIcon__icon.prevTenSecond').addEventListener('click',()=>{
-    if(video.currentTime<10){
-        video.currentTime=0;
-    }else{
-        video.currentTime-=10;
-    }
-})
-document.querySelector('.video__listIcon__icon.nextTenSecond').addEventListener('click',()=>{
-    if(video.duration -video.currentTime<10){
-        video.currentTime=video.duration;
-    }else{
-        video.currentTime+=10;
-    }
-})
-
-document.querySelector(".video__listIcon__icon.fullScreen").addEventListener('click',()=>{
-    var bodyAll=document.querySelector('#container .container__body');
-    console.log(bodyAll.requestFullscreen);
-    if(document.fullscreenElement !== bodyAll){
-        bodyAll.requestFullscreen();
-        var element = event.target || event.srcElement;
-        element.parentElement.innerHTML='<div class="icon__detail"><i class="icon-smallScreen"><i></div>';
-    }else{
-
-        document.exitFullscreen();
-        var element = event.target || event.srcElement;
-        element.parentElement.innerHTML='<div class="icon__detail"><i class="icon-fullScreen"><i></div>';
-    }        
-})
-var volumn=document.querySelector(".video__listIcon__icon.volumn .icon__detail");
-volumn.addEventListener('click',()=>{
-    
-    
-    if(video.muted)
-    {
-        video.muted=false;
-        volumn.innerHTML='<i class="icon-volume-up-1"><i>';
-    }else{
-        video.muted=true;
-        volumn.innerHTML='<i class="icon-volume-off-1"><i>';
-    }
-})
-var setupVolume=document.querySelector(".video__listIcon__icon.volumn .volumn__setup .volumn__setup__volumnAll");
-setupVolume.addEventListener("mousedown",()=>{
-    function mouseMove(){
-        console.log(volumn.getBoundingClientRect().top- document.querySelector('#container .container__body').getBoundingClientRect().top);
-        console.log(event.pageY);
-    }
-    setupVolume.addEventListener("mousemove",mouseMove)
-    setupVolume.addEventListener("mouseup",()=>{
-        setupVolume.removeEventListener("mousemove",mouseMove);
-    })
-}
-)
+// document.querySelector(".video__listIcon__icon.fullScreen").addEventListener('click',()=>{
+//     var bodyAll=document.querySelector('#container .container__body');
+//     console.log(bodyAll.requestFullscreen);
+//     if(document.fullscreenElement !== bodyAll){
+//         bodyAll.requestFullscreen();
+//         var element = event.target || event.srcElement;
+//         element.parentElement.innerHTML='<div class="icon__detail"><i class="icon-smallScreen"><i></div>';
+//     }else{
+//
+//         document.exitFullscreen();
+//         var element = event.target || event.srcElement;
+//         element.parentElement.innerHTML='<div class="icon__detail"><i class="icon-fullScreen"><i></div>';
+//     }
+// })
+// var volumn=document.querySelector(".video__listIcon__icon.volumn .icon__detail");
+// volumn.addEventListener('click',()=>{
+//
+//
+//     if(video.muted)
+//     {
+//         video.muted=false;
+//         volumn.innerHTML='<i class="icon-volume-up-1"><i>';
+//     }else{
+//         video.muted=true;
+//         volumn.innerHTML='<i class="icon-volume-off-1"><i>';
+//     }
+// })
+// var setupVolume=document.querySelector(".video__listIcon__icon.volumn .volumn__setup .volumn__setup__volumnAll");
+// setupVolume.addEventListener("mousedown",()=>{
+//     function mouseMove(){
+//         console.log(volumn.getBoundingClientRect().top- document.querySelector('#container .container__body').getBoundingClientRect().top);
+//         console.log(event.pageY);
+//     }
+//     setupVolume.addEventListener("mousemove",mouseMove)
+//     setupVolume.addEventListener("mouseup",()=>{
+//         setupVolume.removeEventListener("mousemove",mouseMove);
+//     })
+// }
+// )
 var listChapter=document.querySelectorAll(".listChapterFilm__body .listChapter>li");
 listChapter.forEach((Chapter, select) =>{
    Chapter.addEventListener('click',()=>{

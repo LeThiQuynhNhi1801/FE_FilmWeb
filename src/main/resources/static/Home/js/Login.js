@@ -105,7 +105,7 @@ if(localStorage.getItem("Token")){
              password:passwordInput.value
          }
          postData=JSON.stringify(userInfo)
-         xhttp.open("POST", "/auth",false);
+         xhttp.open("POST", "http://127.0.0.1:8080/auth",false);
          xhttp.setRequestHeader("Content-type","application/json")
          xhttp.send(postData)
      }
