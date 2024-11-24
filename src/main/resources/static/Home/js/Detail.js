@@ -9,6 +9,75 @@ if(localStorage.getItem("Token")){
 else{
     // window.location="/Login";
 }
+const apiKey = "73bb2a9d971bd475dd09ab2e69c3aceb"; // Thay bằng API Key của bạn
+
+// function getWeatherByLocation() {
+//     var weather ="";
+//     if (navigator.geolocation) {
+//         navigator.geolocation.getCurrentPosition(
+//             (position) => {
+//                 const latitude = position.coords.latitude;
+//                 const longitude = position.coords.longitude;
+//
+//                 // Gửi yêu cầu tới OpenWeatherMap API
+//                 const url = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${apiKey}&units=metric`;
+//
+//                 fetch(url)
+//                     .then((response) => response.json())
+//                     .then((data) => {
+//                         weather = data.weather[0].description;
+//                         return weather;
+//                     })
+//                     .catch((error) => console.error("Lỗi khi lấy dữ liệu thời tiết:", error));
+//             },
+//             (error) => {
+//                 console.error("Lỗi khi lấy vị trí:", error.message);
+//             }
+//         );
+//     } else {
+//         console.error("Trình duyệt không hỗ trợ Geolocation.");
+//     }
+//
+// }
+function getWeatherByLocation() {
+    return new Promise((resolve, reject) => {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const latitude = position.coords.latitude;
+                    const longitude = position.coords.longitude;
+
+                    // Gửi yêu cầu tới OpenWeatherMap API
+                    const url = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${apiKey}&units=metric`;
+
+                    fetch(url)
+                        .then((response) => response.json())
+                        .then((data) => {
+                            const weather = data.weather[0].description;
+                            resolve(weather); // Trả về kết quả qua Promise
+                        })
+                        .catch((error) => {
+                            console.error("Lỗi khi lấy dữ liệu thời tiết:", error);
+                            reject(error); // Xử lý lỗi qua Promise
+                        });
+                },
+                (error) => {
+                    console.error("Lỗi khi lấy vị trí:", error.message);
+                    reject(error); // Xử lý lỗi qua Promise
+                }
+            );
+        } else {
+            console.error("Trình duyệt không hỗ trợ Geolocation.");
+            reject(new Error("Trình duyệt không hỗ trợ Geolocation."));
+        }
+    });
+}
+
+// Sử dụng hàm với `.then()` hoặc `await`
+
+document.getElementById("backButton").addEventListener("click", function () {
+    window.history.back();
+});
 
 function GetHistoryByChapterIDAndUserLogin(){
     const xhttp = new XMLHttpRequest();
@@ -38,7 +107,7 @@ function GetHistoryByChapterIDAndUserLogin(){
             });
            
         }else if(xhttp.status=404){
-            PostHistoryByChapterIDAndUserLogin();
+            handleWeatherAndPostHistory();
         }
         else if(xhttp.status=401)
         {
@@ -83,7 +152,7 @@ function GetChapterListByChapterID(){
                 
                 if(CategoryList[i].id== parseInt(window.location.pathname.substring(13))){
                     CategoryFilmListHtml+='class="selectedChapter"';
-                    CategoryFilmHtml+=' <video id="videoPlayer" width="640" height="360" controls>'
+                    CategoryFilmHtml+=' <video autoplay id="videoPlayer" width="640" height="360" controls>'
                         +'<source src="'+CategoryList[i].video+'" type="video/mp4"></video>';
                     CategoryFilmNameHtml+='<p>Tập'+CategoryList[i].chapterNumber+' :<span>'+CategoryList[i].chapterName+'</span></p>';
                 }
@@ -116,7 +185,7 @@ function GetChapterListByChapterID(){
     xhttp.setRequestHeader("Authorization",authorization);
     xhttp.send();
 }    
-function PostHistoryByChapterIDAndUserLogin(){
+function PostHistoryByChapterIDAndUserLogin(weather){
     const xhttp = new XMLHttpRequest();
     xhttp.onload = function() 
     {
@@ -134,16 +203,71 @@ function PostHistoryByChapterIDAndUserLogin(){
             // localStorage.removeItem("Token");
             // window.location="/Login";
         }
-    }         
+    }
+    navigator.geolocation.getCurrentPosition(
+        (position) => {
+            console.log("Vĩ độ:", position.coords.latitude);
+            console.log("Kinh độ:", position.coords.longitude);
+        },
+        (error) => {
+            console.error("Lỗi khi lấy vị trí:", error.message);
+        }
+    );
 
+
+    const historyData = {
+        "watchedTime" : watchedTime,
+
+        "rate" : rating,
+
+        "historyView" : formatTimestampToISO(Date.now()) ,
+
+        "device" : getDeviceType(),
+
+        "weather" : weather,
+
+        "time" : formatTimestampToISO(Date.now())
+    }
+    console.log(historyData)
     xhttp.open("POST", domain+"/ApiV1/HistoryByChapterIDAndUserLogin/"+window.location.pathname.substring(13),false);
     //định dạng gửi đi787
     xhttp.setRequestHeader("Content-type","application/json")
     token = localStorage.getItem("Token");
     authorization ='Bearer '+token
     xhttp.setRequestHeader("Authorization",authorization);
-    xhttp.send();
-}  
+    xhttp.send(JSON.stringify(historyData));
+}
+async function handleWeatherAndPostHistory() {
+    try {
+        // Gọi hàm lấy thời tiết
+        const weather = await getWeatherByLocation();
+        console.log("Thời tiết hiện tại:", weather);
+
+        // Sử dụng weather để gọi postHistory
+        PostHistoryByChapterIDAndUserLogin(weather);
+    } catch (error) {
+        console.error("Lỗi khi xử lý thời tiết hoặc gọi postHistory:", error);
+    }
+}
+
+function formatTimestampToISO(timestamp) {
+    const date = new Date(timestamp);
+
+    // Lấy từng thành phần ngày, giờ
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0"); // Tháng bắt đầu từ 0
+    const day = String(date.getDate()).padStart(2, "0");
+    const hours = String(date.getHours()).padStart(2, "0");
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+    const seconds = String(date.getSeconds()).padStart(2, "0");
+
+    // Ghép thành chuỗi ISO-8601
+    return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
+}
+
+
+
+
 function ChangeRateHistoryByChapterIDAndUserLogin(){
     
     const xhttp = new XMLHttpRequest();
@@ -165,7 +289,15 @@ function ChangeRateHistoryByChapterIDAndUserLogin(){
         }
     }         
     const historydata ={
-        rate:rating
+        "watchedTime" : watchedTime,
+
+        "rate" : rating,
+
+        "historyView" : formatTimestampToISO(Date.now()),
+
+        "device" : getDeviceType(),
+
+        "time" : formatTimestampToISO(Date.now())
     }
     historydataJson = JSON.stringify(historydata);
     xhttp.open("PATCH", domain+"/ApiV1/HistoryByChapterIDAndUserLogin/"+window.location.pathname.substring(13),false);
@@ -195,7 +327,7 @@ function ChangewatchedTimeHistoryByChapterIDAndUserLogin(){
             // localStorage.removeItem("Token");
             // window.location="/Login";
         }
-    }         
+    }
     const historydata ={
         watchedTime:watchedTime
     }
@@ -207,7 +339,23 @@ function ChangewatchedTimeHistoryByChapterIDAndUserLogin(){
     authorization ='Bearer '+token
     xhttp.setRequestHeader("Authorization",authorization);
     xhttp.send(historydataJson);
-}  
+}
+function getDeviceType() {
+    const userAgent = navigator.userAgent;
+
+    if (/mobile/i.test(userAgent)) {
+        return "Phone";
+    }
+    if (/tablet|ipad|playbook|silk/i.test(userAgent)) {
+        return "Ipad";
+    }
+    if (/Mac|Windows|Linux/i.test(userAgent)) {
+        return "Computer";
+    }
+
+    return "Không xác định";
+}
+
 //rating event
 const stars = document.querySelectorAll('.star');
 

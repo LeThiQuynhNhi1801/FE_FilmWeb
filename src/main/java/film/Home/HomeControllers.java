@@ -6,34 +6,36 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Controller
 
 public class HomeControllers {
-        @GetMapping("/Login")
-        public String hello() {
-            return "Home/Login";
-        }
-    @GetMapping("/play")
-    public String play() {
-        return "Home/video";
+    @GetMapping("/Login")
+    public String hello() {
+        return "Home/Login";
     }
-        @GetMapping("/Home")
-        public String home() {
+
+    @GetMapping("/Home")
+    public String home() {
         return "Home/Home";
     }
-        @GetMapping("/DetailVideo/{IDChapter}")
-        public String DetailVideo() {
-            return "Home/Detail";
-        }
-        @GetMapping("/Signup")
-        public String Signup() {
-            return "Home/Signup";
-        }
-        @GetMapping("/Home/UserInfor")
-        public String UserInfor() {
-            return "Home/UserInfor";
-        }
-        @GetMapping("/Home/UserChangePassword")
-        public String UserChangePassword() {
+
+    @GetMapping("/DetailVideo/{IDChapter}")
+    public String DetailVideo() {
+        return "Home/Detail";
+    }
+
+    @GetMapping("/Signup")
+    public String Signup() {
+        return "Home/Signup";
+    }
+
+    @GetMapping("/Home/UserInfor")
+    public String UserInfor() {
+        return "Home/UserInfor";
+    }
+
+    @GetMapping("/Home/UserChangePassword")
+    public String UserChangePassword() {
         return "Home/ChangePassword";
     }
+
     public String layChuoiSauDauCham(String chuoi) {
         int viTriDauCham = chuoi.lastIndexOf('.');
         if (viTriDauCham >= 0 && viTriDauCham < chuoi.length() - 1) {

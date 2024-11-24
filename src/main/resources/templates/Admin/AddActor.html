@@ -100,6 +100,7 @@
         
     </div>
     <script>
+        const domain = "http://localhost:8080"
      function CheckAdmin(){
              const xhttp = new XMLHttpRequest();
                 xhttp.onload = function()
@@ -127,7 +128,7 @@
                     }
                 }
 
-                xhttp.open("GET", "/user",false);
+         xhttp.open("GET", domain + "/user", false);
 
                 xhttp.setRequestHeader("Content-type","application/json")
                 token = localStorage.getItem("Token");
@@ -182,7 +183,7 @@
             
             var actorPostJson =JSON.stringify(actorPost);
             //khai báo phương thức và đường dẫn để request
-            xhttp.open("POST", "/ApiV1/AllActor",false);
+            xhttp.open("POST", domain + "/ApiV1/AllActor", false);
             //định dạng gửi đi787
             xhttp.setRequestHeader("Content-type","application/json")
             token = localStorage.getItem("Token");

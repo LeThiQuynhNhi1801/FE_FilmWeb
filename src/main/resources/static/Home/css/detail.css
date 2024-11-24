@@ -33,6 +33,10 @@ body{
     left: 0;
     height: 18vh;
 }
+.container__video__option{
+    position: relative;
+    z-index: 1;
+}
 .container__video__option .video__option__time{
     opacity: 0.7;
     height: 18px;
@@ -89,6 +93,7 @@ body{
 }
 .video__option__setup .option__setup__video{
     display: flex;
+    margin-left: 20px;
 }
 .option__setup__video .setup__video__listIcon{
     display: flex;
@@ -191,7 +196,15 @@ body{
 .option__setup__about .video__listIcon__icon:hover .listChapterFilm{
     display: block;
 }
+.setup__video__listIcon .icon__detail{
+    opacity: 0.8;
+    margin-right: 10px;
+}
+.setup__video__listIcon:hover .icon__detail{
+    cursor: pointer;
+    opacity: 1;
 
+}
 .listChapterFilm #listChapterFilm__container{
     height: 100%;
 }

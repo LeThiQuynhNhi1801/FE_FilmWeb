@@ -201,10 +201,10 @@ function GetHotChapter(){
         if(xhttp.status==200)
         {
             
-           
+           console.log("HH",ChapterHot)
             var ChapterHotElement = document.getElementById('ChapterHot');
             var ChapterHotHtml='';
-            ChapterHotHtml+='<div class="movieHots__movie__content" id="movie__hotFirst"><div class="movie__content__img"><img src="'+ChapterHot.chapterImage +'" alt=""></div><div class="movie__content__video"><video src="'+ChapterHot.trailerChapter+'" autoplay="true" muted="true"></video></div></div><div class="movieHots__movie__body"><div class="movie__body__aboutMovie"><div class="aboutMovie__imgName"><img src="'+ChapterHot.film.chapterImage+'" alt=""></div><div class="aboutMovie__des"><h1>Xem ngay mùa 2</h1><p>'+ChapterHot.chapterDescription+'</p></div><div class="aboutMovie__action"><a href="/DetailVideo/'+ChapterHot.id+'" class="aboutMovie__action__play"><button><i class="fa-solid fa-play"></i> Play</button></a><button class="aboutMovie__action__infor"><i class="fa-solid fa-circle-info"></i> Thông tin khác</button></div></div></div>';
+            ChapterHotHtml+='<div class="movieHots__movie__content" id="movie__hotFirst"><div class="movie__content__img"><img src="'+ChapterHot.chapterImage +'" alt=""></div><div class="movie__content__video"><video src="'+ChapterHot.trailerChapter+'" autoplay="true" muted="true"></video></div></div><div class="movieHots__movie__body"><div class="movie__body__aboutMovie"><div class="aboutMovie__imgName"><img src="'+ChapterHot.chapterImage+'" alt=""></div><div class="aboutMovie__des"><h1>Xem ngay mùa 2</h1><p>'+ChapterHot.chapterDescription+'</p></div><div class="aboutMovie__action"><a href="/DetailVideo/'+ChapterHot.id+'" class="aboutMovie__action__play"><button><i class="fa-solid fa-play"></i> Play</button></a><button class="aboutMovie__action__infor"><i class="fa-solid fa-circle-info"></i> Thông tin khác</button></div></div></div>';
             ChapterHotElement.innerHTML = ChapterHotHtml;
             
         }
@@ -410,7 +410,7 @@ window.addEventListener('load', function() {
 let timeoutId;
 const movieHot =document.querySelector(".container__movieHots__movie");
 var video =document.querySelector("#movie__hotFirst .movie__content__video video");
-video.pause();
+// video.pause();
 
 var mute =document.querySelector("#header .header__mute .header_mute__icon");
 

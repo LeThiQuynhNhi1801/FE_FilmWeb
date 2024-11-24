@@ -195,6 +195,7 @@
         
     </div>
     <script>
+        const domain = "http://localhost:8080"
      function CheckAdmin(){
              const xhttp = new XMLHttpRequest();
                 xhttp.onload = function()
@@ -222,7 +223,7 @@
                     }
                 }
 
-                xhttp.open("GET", "/user",false);
+                xhttp.open("GET", domain+"/user",false);
 
                 xhttp.setRequestHeader("Content-type","application/json")
                 token = localStorage.getItem("Token");
@@ -298,7 +299,7 @@
                 }
             };
             
-            xhr.open('PATCH', '/ApiV1/FilmByID/'+window.location.pathname.substring(16), true);
+            xhr.open('PATCH', domain+'/ApiV1/FilmByID/'+window.location.pathname.substring(16), true);
             var jwtToken = localStorage.getItem("Token");
             xhr.setRequestHeader('Authorization', 'Bearer ' + jwtToken);
            
@@ -367,7 +368,7 @@
             }
         }         
         //khai báo phương thức và đường dẫn để request
-        xhttp.open("GET", "/ApiV1/FilmByID/"+window.location.pathname.substring(16),false);
+        xhttp.open("GET", domain+"/ApiV1/FilmByID/"+window.location.pathname.substring(16),false);
         //định dạng gửi đi787
         xhttp.setRequestHeader("Content-type","application/json")
         token = localStorage.getItem("Token");
@@ -411,7 +412,7 @@
                 }
             }         
             //khai báo phương thức và đường dẫn để request
-            xhttp.open("GET", "/ApiV1/AllCategory",false);
+            xhttp.open("GET", domain+"/ApiV1/AllCategory",false);
             //định dạng gửi đi787
             xhttp.setRequestHeader("Content-type","application/json")
             token = localStorage.getItem("Token");
@@ -453,7 +454,7 @@
                 }
             }         
             //khai báo phương thức và đường dẫn để request
-            xhttp.open("GET", "/ApiV1/AllActor",false);
+            xhttp.open("GET", domain+"/ApiV1/AllActor",false);
             //định dạng gửi đi787
             xhttp.setRequestHeader("Content-type","application/json")
             token = localStorage.getItem("Token");
@@ -484,7 +485,7 @@
                 }
             }         
             //khai báo phương thức và đường dẫn để request
-            xhttp.open("DELETE", "/ApiV1/ChapterByID/"+ChapterID,false);
+            xhttp.open("DELETE", domain+"/ApiV1/ChapterByID/"+ChapterID,false);
             //định dạng gửi đi787
             xhttp.setRequestHeader("Content-type","application/json")
             token = localStorage.getItem("Token");

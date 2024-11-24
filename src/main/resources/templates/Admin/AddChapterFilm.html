@@ -138,6 +138,7 @@
         
     </div>
     <script>
+        const domain = "http://localhost:8080"
      function CheckAdmin(){
              const xhttp = new XMLHttpRequest();
                 xhttp.onload = function()
@@ -165,7 +166,7 @@
                     }
                 }
 
-                xhttp.open("GET", "/user",false);
+         xhttp.open("GET", domain + "/user", false);
 
                 xhttp.setRequestHeader("Content-type","application/json")
                 token = localStorage.getItem("Token");
@@ -237,8 +238,8 @@
                     
                 }
             };
-            
-            xhr.open('POST', '/ApiV1/ChapterByFilmID/'+window.location.pathname.substring(26), true);
+
+            xhr.open('POST', domain + '/ApiV1/ChapterByFilmID/' + window.location.pathname.substring(26), true);
             var jwtToken = localStorage.getItem("Token");
             xhr.setRequestHeader('Authorization', 'Bearer ' + jwtToken);
            
@@ -275,7 +276,7 @@
                 }
             }         
             //khai báo phương thức và đường dẫn để request
-            xhttp.open("GET", "/ApiV1/AllActor",false);
+            xhttp.open("GET", domain + "/ApiV1/AllActor", false);
             //định dạng gửi đi787
             xhttp.setRequestHeader("Content-type","application/json")
             token = localStorage.getItem("Token");
