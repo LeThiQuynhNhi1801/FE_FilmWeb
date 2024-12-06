@@ -6,13 +6,13 @@ var demCategory=0;
 const domain = "http://127.0.0.1:8080";
 
 if(localStorage.getItem("Token")){
-    
+
     GetHotChapter();
-    GetChapterRecommend();
+    handleGetRecommend();
     GetHistoryUserLogin();
     GetCategoryFilmList();
-    
-    
+
+
 }
 else{
     window.location="/Login";
@@ -21,17 +21,17 @@ function LogOut(){
     window.location="/Login";
     localStorage.removeItem("Token");
 }
-function GetChapterRecommend(){
+function GetChapterRecommend(weather){
     const xhttp = new XMLHttpRequest();
-    xhttp.onload = function() 
+    xhttp.onload = function()
     {
-        
+
         if(xhttp.status==200)
         {
-          
+
             var RecommendChapterJson=xhttp.responseText
             var RecommendChapter= JSON.parse(RecommendChapterJson)
-            
+
             var RecommendChapterElement = document.getElementById('RecommendChapter');
             var RecommendChapterHtml=' <span class="prev"><i class="fa-solid fa-angle-left"></i></span>';
             for(var i = 0;i<RecommendChapter.length;i++)
@@ -45,33 +45,153 @@ function GetChapterRecommend(){
             localStorage.removeItem("Token");
             window.location="/Login"
         }
-    }         
+    }
+    navigator.geolocation.getCurrentPosition(
+        (position) => {
+            console.log("Vĩ độ:", position.coords.latitude);
+            console.log("Kinh độ:", position.coords.longitude);
+        },
+        (error) => {
+            console.error("Lỗi khi lấy vị trí:", error.message);
+        }
+    );
+    const historyData = {
+        "device" : getDeviceType(),
+
+        "weather" : weather,
+
+        "time" : formatTimestampToISO(Date.now())
+    }
     //khai báo phương thức và đường dẫn để request
-    xhttp.open("GET", domain+"/ApiV1/Recommend",false);
+    xhttp.open("POST", domain+"/ApiV1/recommendation",false);
     //định dạng gửi đi787
     xhttp.setRequestHeader("Content-type","application/json")
     token = localStorage.getItem("Token");
     authorization ='Bearer '+token
     xhttp.setRequestHeader("Authorization",authorization);
-    xhttp.send();
+    xhttp.send(JSON.stringify(historyData));
+}
+const apiKey = "73bb2a9d971bd475dd09ab2e69c3aceb"; // Thay bằng API Key của bạn
+
+// function getWeatherByLocation() {
+//     var weather ="";
+//     if (navigator.geolocation) {
+//         navigator.geolocation.getCurrentPosition(
+//             (position) => {
+//                 const latitude = position.coords.latitude;
+//                 const longitude = position.coords.longitude;
+//
+//                 // Gửi yêu cầu tới OpenWeatherMap API
+//                 const url = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${apiKey}&units=metric`;
+//
+//                 fetch(url)
+//                     .then((response) => response.json())
+//                     .then((data) => {
+//                         weather = data.weather[0].description;
+//                         return weather;
+//                     })
+//                     .catch((error) => console.error("Lỗi khi lấy dữ liệu thời tiết:", error));
+//             },
+//             (error) => {
+//                 console.error("Lỗi khi lấy vị trí:", error.message);
+//             }
+//         );
+//     } else {
+//         console.error("Trình duyệt không hỗ trợ Geolocation.");
+//     }
+//
+// }
+function getWeatherByLocation() {
+    return new Promise((resolve, reject) => {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const latitude = position.coords.latitude;
+                    const longitude = position.coords.longitude;
+
+                    // Gửi yêu cầu tới OpenWeatherMap API
+                    const url = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${apiKey}&units=metric`;
+
+                    fetch(url)
+                        .then((response) => response.json())
+                        .then((data) => {
+                            const weather = data.weather[0].description;
+                            resolve(weather); // Trả về kết quả qua Promise
+                        })
+                        .catch((error) => {
+                            console.error("Lỗi khi lấy dữ liệu thời tiết:", error);
+                            reject(error); // Xử lý lỗi qua Promise
+                        });
+                },
+                (error) => {
+                    console.error("Lỗi khi lấy vị trí:", error.message);
+                    reject(error); // Xử lý lỗi qua Promise
+                }
+            );
+        } else {
+            console.error("Trình duyệt không hỗ trợ Geolocation.");
+            reject(new Error("Trình duyệt không hỗ trợ Geolocation."));
+        }
+    });
+}
+async function handleGetRecommend() {
+    try {
+        // Gọi hàm lấy thời tiết
+        const weather = await getWeatherByLocation();
+        console.log("Thời tiết hiện tại:", weather);
+
+        // Sử dụng weather để gọi postHistory
+        GetChapterRecommend(weather);
+    } catch (error) {
+        console.error("Lỗi khi xử lý thời tiết hoặc gọi postHistory:", error);
+    }
+}
+function getDeviceType() {
+    const userAgent = navigator.userAgent;
+
+    if (/mobile/i.test(userAgent)) {
+        return "Phone";
+    }
+    if (/tablet|ipad|playbook|silk/i.test(userAgent)) {
+        return "Ipad";
+    }
+    if (/Mac|Windows|Linux/i.test(userAgent)) {
+        return "Computer";
+    }
+
+    return "Không xác định";
+}
+function formatTimestampToISO(timestamp) {
+    const date = new Date(timestamp);
+
+    // Lấy từng thành phần ngày, giờ
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0"); // Tháng bắt đầu từ 0
+    const day = String(date.getDate()).padStart(2, "0");
+    const hours = String(date.getHours()).padStart(2, "0");
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+    const seconds = String(date.getSeconds()).padStart(2, "0");
+
+    // Ghép thành chuỗi ISO-8601
+    return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
 }
 function GetHistoryUserLogin(){
     const xhttp = new XMLHttpRequest();
-    xhttp.onload = function() 
+    xhttp.onload = function()
     {
         var ChapterHotJson=xhttp.responseText
         var ChapterHot= JSON.parse(ChapterHotJson)
         if(xhttp.status==200)
         {
-            
+
             ChapterHot.forEach(
                 (currentValue, index) =>{
                     historyUserLogin.push(currentValue.id);
-                  }
+                }
             );
-            
-           console.log(historyUserLogin);
-            
+
+            console.log(historyUserLogin);
+
         }
         else if(xhttp.status==401)
         {
@@ -81,7 +201,7 @@ function GetHistoryUserLogin(){
             localStorage.removeItem("Token");
             window.location="/Login"
         }
-    }         
+    }
     //khai báo phương thức và đường dẫn để request
     xhttp.open("GET", domain+"/ApiV1/HistoryUserLogin",false);
     //định dạng gửi đi787
@@ -91,70 +211,69 @@ function GetHistoryUserLogin(){
     xhttp.setRequestHeader("Authorization",authorization);
     //gửi
     xhttp.send();
-}  
+}
 function GetCategoryFilmList(){
     const xhttp = new XMLHttpRequest();
-    xhttp.onload = function() 
+    xhttp.onload = function()
     {
         var CategoryFilmJson=xhttp.responseText
         var CategoryFilm= JSON.parse(CategoryFilmJson)
         if(xhttp.status==200)
         {
-            
+
             check= new Array(CategoryFilm.length+1).fill(0);
-            
+
             var CategoryFilmElement = document.getElementById('CategoryFilm');
             var CategoryFilmHtml='';
             for(var i = 0;i<CategoryFilm.length;i++)
-            {   
-              
+            {
+
                 if(CategoryFilm[i].films.length!=0 )
                 {
-                   
                     var countFilm=0;
                     demCategory++;
                     CategoryFilmDetailHtml='<div class="ToiecList__ToiecVideos"><div class="ToiecVideos__ToiecName"><h1>'+CategoryFilm[i].categoryName+'</h1></div><div class="ToeicVideos__VideoList"><span class="prev"><i class="fa-solid fa-angle-left"></i></span> ';
                     for(var j=0;j<CategoryFilm[i].films.length;j++)
                     {
-                        
+
                         try{
-                            
-                            if(CategoryFilm[i].films[j].chapters[0].chapterStatus=='Đã Ra')
+
+                            if(CategoryFilm[i].films[j].chapters[0].chapterStatus=='Đã phát hành')
                             {
-                                
+
                                 var lastHistory='';
-                                
+
                                 try{
                                     lastHistory ='<div class="VideoList__Videos"><a href="/DetailVideo/'+CategoryFilm[i].films[j].chapters[0].id+'" class="Videos__video"><div class="Videos__video__content"><div class="video__content__img"><img src="'+CategoryFilm[i].films[j].chapters[0].chapterImage+'" alt=""></div><div class="video__content__video"><video src="'+CategoryFilm[i].films[j].chapters[0].video+'" autoplay muted="true"></video></div><div class="video__content__des"><div class="content__des__body"><div class="des__body__listIcon"><div class="listIcon__icon"><i class="fa-solid fa-play"></i></div></div><div class="des__body__title"><p>'+CategoryFilm[i].films[j].chapters[0].chapterName+'</p><p>Thể loại: <span>'+CategoryFilm[i].categoryName+'</span></p></div></div></div></div></a></div>';
-                                   
+
                                 }
                                 catch{
                                     lastHistory='';
                                 }
-                                
+
                                 countFilm++;
-                                
+
                                 for(var k=0;k<CategoryFilm[i].films[j].chapters.length;k++)
                                 {
-                                      if(CategoryFilm[i].films[j].chapters[k].chapterStatus=='Đã Ra')
+                                    if(CategoryFilm[i].films[j].chapters[k].chapterStatus=='Đã Ra')
                                     {
-                                        
+
                                         if(historyUserLogin.includes(CategoryFilm[i].films[j].chapters[k].id))
                                         {
-                                            
+
                                             lastHistory ='<div class="VideoList__Videos"><a href="/DetailVideo/'+CategoryFilm[i].films[j].chapters[k].id+'" class="Videos__video"><div class="Videos__video__content"><div class="video__content__img"><img src="'+CategoryFilm[i].films[j].chapters[k].chapterImage+'" alt=""></div><div class="video__content__video"><video src="'+CategoryFilm[i].films[j].chapters[k].video+'" autoplay muted="true"></video></div><div class="video__content__des"><div class="content__des__body"><div class="des__body__listIcon"><div class="listIcon__icon"><i class="fa-solid fa-play"></i></div></div><div class="des__body__title"><p>'+CategoryFilm[i].films[j].chapters[k].chapterName+'</p><p>Thể loại: <span>'+CategoryFilm[i].categoryName+'</span></p></div></div></div></div></a></div>';
-                                        
+
                                         }
                                     }
-                                    
+
                                 }
                                 CategoryFilmDetailHtml+=lastHistory;
-                                
+
                             }
-                           
+
                         }
                         catch{
-                            
+
                         }
                     }
                     CategoryFilmDetailHtml+='<span class="next"><i class="fa-solid fa-angle-right"></i></span></div></div>';
@@ -167,12 +286,13 @@ function GetCategoryFilmList(){
                     }
                 }
             }
+            console.log(CategoryFilmHtml)
             CategoryFilmElement.innerHTML = CategoryFilmHtml;
             prevs=document.querySelectorAll('.ToeicVideos__VideoList .prev');
             nexts=document.querySelectorAll('.ToeicVideos__VideoList .next');
-            
+
             for(var i=0;i<demCategory+1;i++){
-                
+
 
                 checkPrevAndNext(i);
             }
@@ -181,7 +301,7 @@ function GetCategoryFilmList(){
             // localStorage.removeItem("Token");
             // window.location="/Login"
         }
-    }         
+    }
     //khai báo phương thức và đường dẫn để request
     xhttp.open("GET", domain+"/ApiV1/CategoryAllFim",false);
     //định dạng gửi đi787
@@ -190,29 +310,29 @@ function GetCategoryFilmList(){
     authorization ='Bearer '+token
     xhttp.setRequestHeader("Authorization",authorization);
     xhttp.send();
-}    
+}
 
 function GetHotChapter(){
     const xhttp = new XMLHttpRequest();
-    xhttp.onload = function() 
+    xhttp.onload = function()
     {
         var ChapterHotJson=xhttp.responseText
         var ChapterHot= JSON.parse(ChapterHotJson)[0]
         if(xhttp.status==200)
         {
-            
-           console.log("HH",ChapterHot)
+
+            console.log("HH",ChapterHot)
             var ChapterHotElement = document.getElementById('ChapterHot');
             var ChapterHotHtml='';
             ChapterHotHtml+='<div class="movieHots__movie__content" id="movie__hotFirst"><div class="movie__content__img"><img src="'+ChapterHot.chapterImage +'" alt=""></div><div class="movie__content__video"><video src="'+ChapterHot.trailerChapter+'" autoplay="true" muted="true"></video></div></div><div class="movieHots__movie__body"><div class="movie__body__aboutMovie"><div class="aboutMovie__imgName"><img src="'+ChapterHot.chapterImage+'" alt=""></div><div class="aboutMovie__des"><h1>Xem ngay mùa 2</h1><p>'+ChapterHot.chapterDescription+'</p></div><div class="aboutMovie__action"><a href="/DetailVideo/'+ChapterHot.id+'" class="aboutMovie__action__play"><button><i class="fa-solid fa-play"></i> Play</button></a><button class="aboutMovie__action__infor"><i class="fa-solid fa-circle-info"></i> Thông tin khác</button></div></div></div>';
             ChapterHotElement.innerHTML = ChapterHotHtml;
-            
+
         }
         else if(xhttp.status==403){
             localStorage.removeItem("Token");
             window.location="/Login"
         }
-    }         
+    }
     //khai báo phương thức và đường dẫn để request
     xhttp.open("GET", domain+"/ApiV1/ChapterHot",false);
     //định dạng gửi đi787
@@ -221,18 +341,18 @@ function GetHotChapter(){
     authorization ='Bearer '+token
     xhttp.setRequestHeader("Authorization",authorization);
     xhttp.send();
-}    
+}
 function Search(){
     if(event.keyCode==13){
         const xhttp = new XMLHttpRequest();
         var searchFilmValue =document.getElementById('searchFilm').value;
-        xhttp.onload = function() 
+        xhttp.onload = function()
         {
             var listFilmJson=xhttp.responseText
             var listFilm= JSON.parse(listFilmJson)
             if(xhttp.status==200)
             {
-               
+
                 var ChapterHotElement = document.getElementById('listFilmSearch');
                 var ChapterHotHtml='';
                 ChapterHotHtml+='<div class="ToiecVideos__ToiecName"><h1>SearchFilm</h1></div><div class="ToeicVideos__VideoList"><span class="prev"><i class="fa-solid fa-angle-left"></i></span>'
@@ -250,26 +370,26 @@ function Search(){
                 if(check[0]==0)
                 {
                     prevx.style.display='none';
-                    
+
                 }
                 else if(check[0]==5){
-                    
+
                     nextx.style.display='none';
                 }
                 else{
                     prevx.style.display='flex';
                     nextx.style.display='flex';
                 }
-                
+
                 prevx.addEventListener('click',()=>{
-        
+
                     var videoAll=nextx.parentElement.querySelectorAll('.VideoList__Videos');
                     check[0] -=1;
-                
+
                     videoAll.forEach((element
                     )=>{
                         element.style.transform='translateX(-'+500*check[0]+'%)';
-                        
+
                         if(0+1==(check[0]+1)*5+6){
                             element.querySelector('.Videos__video').classList.remove("Video__final");
                             element.querySelector('.Videos__video').addEventListener('mouseenter',mouseenterDetailVideo);
@@ -303,37 +423,37 @@ function Search(){
                             }
                         }
                     });
-                    
-                    
+
+
                     if(check[0]==0)
-                {
-                    prevx.style.display='none';
-                    
-                }
-                else if(check[0]==5){
-                    
-                    nextx.style.display='none';
-                }
-                else{
-                    prevx.style.display='flex';
-                    nextx.style.display='flex';
-                }
-                    
-                   
-                    
-                }) 
-                
-                
+                    {
+                        prevx.style.display='none';
+
+                    }
+                    else if(check[0]==5){
+
+                        nextx.style.display='none';
+                    }
+                    else{
+                        prevx.style.display='flex';
+                        nextx.style.display='flex';
+                    }
+
+
+
+                })
+
+
                 nextx.addEventListener('click',() => {
-        
+
                     var videoAll=nextx.parentElement.querySelectorAll('.VideoList__Videos');
-                    
+
                     check[0] +=1;
-                    
+
                     videoAll.forEach((element)=>{
-        
+
                         element.style.transform='translateX(-'+500*check[0]+'%)';
-        
+
                         if(0+1==(check[0]-1)*5+6){
                             element.querySelector('.Videos__video').classList.remove("Video__final");
                             element.querySelector('.Videos__video').addEventListener('mouseenter',mouseenterDetailVideo);
@@ -366,31 +486,31 @@ function Search(){
                                 element.querySelector('.Videos__video').addEventListener('mouseleave',mouseleaveDetailVideo);
                             }
                         }
-        
+
                     });
                     if(check[0]==0)
-                {
-                    prevx.style.display='none';
-                    
-                }
-                else if(check[0]==5){
-                    
-                    nextx.style.display='none';
-                }
-                else{
-                    prevx.style.display='flex';
-                    nextx.style.display='flex';
-                }
-                
+                    {
+                        prevx.style.display='none';
+
+                    }
+                    else if(check[0]==5){
+
+                        nextx.style.display='none';
+                    }
+                    else{
+                        prevx.style.display='flex';
+                        nextx.style.display='flex';
+                    }
+
                 })
-                
-                
+
+
             }
             else if(xhttp.status==403){
                 localStorage.removeItem("Token");
                 window.location="/Login"
             }
-        }         
+        }
         //khai báo phương thức và đường dẫn để request
         xhttp.open("GET", domain+"/ApiV1/FindFilm/"+searchFilmValue,false);
         //định dạng gửi đi787
@@ -405,8 +525,8 @@ const header = document.querySelector('#header');
 
 window.addEventListener('load', function() {
     var video =document.querySelector("#movie__hotFirst .movie__content__video video");
-    
-  });
+
+});
 let timeoutId;
 const movieHot =document.querySelector(".container__movieHots__movie");
 var video =document.querySelector("#movie__hotFirst .movie__content__video video");
@@ -419,7 +539,7 @@ mute.addEventListener("click",()=>{
     {
         video.muted=false;
         mute.innerHTML="<i class='icon-volume'></i>";
-        
+
     }
     else{
         video.muted=true;
@@ -429,63 +549,63 @@ mute.addEventListener("click",()=>{
 
 let g=0;
 video.addEventListener("timeupdate",()=>{
-   
-    if(document.querySelector("#movie__hotFirst .movie__content__video video").currentTime>0){
-        
-    if(document.querySelector("#movie__hotFirst .movie__content__video video").currentTime>=2)
-    {
-        document.querySelector(".movie__body__aboutMovie .aboutMovie__des").classList.add("maxheight");
-        document.querySelector(".movie__body__aboutMovie .aboutMovie__imgName ").style.width="60%";
-    }
-    else{
-        document.querySelector(".movie__body__aboutMovie .aboutMovie__des").classList.remove("maxheight");
-        document.querySelector(".movie__body__aboutMovie .aboutMovie__imgName ").style.width="100%";
-    }
-    if(document.querySelector("#movie__hotFirst .movie__content__video video").ended)
-    {
-        document.querySelector(".movie__body__aboutMovie .aboutMovie__des").classList.remove("maxheight");
-        document.querySelector(".movie__body__aboutMovie .aboutMovie__imgName ").style.width="100%";
-        document.querySelector("#movie__hotFirst .movie__content__video").style.opacity=0;
-        document.querySelector("#movie__hotFirst .movie__content__img").style.opacity = 1;
-        
-        
-        setTimeout(function (){
-            
-            document.querySelector("#movie__hotFirst .movie__content__video").style.display="none";
-            
-            document.querySelector("#movie__hotFirst .movie__content__img").style.display="block";
-            g=0;
 
-            document.querySelector("#movie__hotFirst .movie__content__video video").currentTime=0;
-            document.querySelector("#movie__hotFirst .movie__content__video video").pause();
-         
-            
-        },1000)
-    }}
-}
+        if(document.querySelector("#movie__hotFirst .movie__content__video video").currentTime>0){
+
+            if(document.querySelector("#movie__hotFirst .movie__content__video video").currentTime>=2)
+            {
+                document.querySelector(".movie__body__aboutMovie .aboutMovie__des").classList.add("maxheight");
+                document.querySelector(".movie__body__aboutMovie .aboutMovie__imgName ").style.width="60%";
+            }
+            else{
+                document.querySelector(".movie__body__aboutMovie .aboutMovie__des").classList.remove("maxheight");
+                document.querySelector(".movie__body__aboutMovie .aboutMovie__imgName ").style.width="100%";
+            }
+            if(document.querySelector("#movie__hotFirst .movie__content__video video").ended)
+            {
+                document.querySelector(".movie__body__aboutMovie .aboutMovie__des").classList.remove("maxheight");
+                document.querySelector(".movie__body__aboutMovie .aboutMovie__imgName ").style.width="100%";
+                document.querySelector("#movie__hotFirst .movie__content__video").style.opacity=0;
+                document.querySelector("#movie__hotFirst .movie__content__img").style.opacity = 1;
+
+
+                setTimeout(function (){
+
+                    document.querySelector("#movie__hotFirst .movie__content__video").style.display="none";
+
+                    document.querySelector("#movie__hotFirst .movie__content__img").style.display="block";
+                    g=0;
+
+                    document.querySelector("#movie__hotFirst .movie__content__video video").currentTime=0;
+                    document.querySelector("#movie__hotFirst .movie__content__video video").pause();
+
+
+                },1000)
+            }}
+    }
 )
 movieHot.addEventListener("mouseenter", () => {
-   
-timeoutId = setTimeout(() => {
-    
-    if(g!==0){
-    document.querySelector("#movie__hotFirst .movie__content__video").style.transition="opacity 1s linear";
-    document.querySelector("#movie__hotFirst .movie__content__img").style.transition="opacity 1s linear";
-    document.querySelector("#movie__hotFirst .movie__content__video").style.opacity=1;
-    document.querySelector("#movie__hotFirst .movie__content__img").style.opacity = 0;
-    
-    document.querySelector("#movie__hotFirst .movie__content__video video").play();
-    
-    setTimeout(function (){
-       
-        document.querySelector("#movie__hotFirst .movie__content__video").style.display="block";
 
-        document.querySelector("#movie__hotFirst .movie__content__img").style.display="none";
-        
-    },1000);}
-}, 1000);
+    timeoutId = setTimeout(() => {
 
-g++;
+        if(g!==0){
+            document.querySelector("#movie__hotFirst .movie__content__video").style.transition="opacity 1s linear";
+            document.querySelector("#movie__hotFirst .movie__content__img").style.transition="opacity 1s linear";
+            document.querySelector("#movie__hotFirst .movie__content__video").style.opacity=1;
+            document.querySelector("#movie__hotFirst .movie__content__img").style.opacity = 0;
+
+            document.querySelector("#movie__hotFirst .movie__content__video video").play();
+
+            setTimeout(function (){
+
+                document.querySelector("#movie__hotFirst .movie__content__video").style.display="block";
+
+                document.querySelector("#movie__hotFirst .movie__content__img").style.display="none";
+
+            },1000);}
+    }, 1000);
+
+    g++;
 });
 
 movieHot.addEventListener("mouseleave", () => {
@@ -504,18 +624,18 @@ movieHot.addEventListener("mouseleave", () => {
 
 //cuộn màn hình
 window.addEventListener('scroll', () => {
-if (window.scrollY > 0) {
-    header.classList.add('scroll');
-} else {
-    header.classList.remove('scroll');
-}
+    if (window.scrollY > 0) {
+        header.classList.add('scroll');
+    } else {
+        header.classList.remove('scroll');
+    }
 });
 
 //thanh srearch
 var search=document.querySelector(".header__userInfor__search input");
 search.addEventListener("focus",function(){
     document.querySelector(".header__userInfor__search i:first-of-type ").classList.add("focus");
-    
+
 });
 search.addEventListener("blur",function(){
     document.querySelector(".header__userInfor__search i:first-of-type ").classList.remove("focus");
@@ -532,23 +652,23 @@ sumOfArray(detailVideos);
 function mouseenterDetailVideo(e)
 {
     var element = e.target || e.srcElement;
-   
+
     {
         detailoutId = setTimeout(() => {
-            
+
             element.querySelector(".video__content__img").style.opacity=0;
             element.querySelector(".video__content__video").style.opacity=1;
-            element.querySelector(".video__content__video").style.height="55%"; 
-            element.querySelector(".video__content__img").style.height="55%"; 
+            element.querySelector(".video__content__video").style.height="55%";
+            element.querySelector(".video__content__img").style.height="55%";
             element.querySelector(".Videos__video__content").classList.add("videoScale");
             element.parentElement.style.zIndex="100000";
             element.querySelector(".video__content__img").style.display="none";
             element.querySelector(".video__content__video").style.display="block";
             var videodetail =element.querySelector('video');
-            
+
             videodetail.muted=false;
             videodetail.play();
-            videodetail.addEventListener('timeupdate',() => 
+            videodetail.addEventListener('timeupdate',() =>
             {
                 if(videodetail.ended)
                 {
@@ -564,13 +684,13 @@ function mouseleaveDetailVideo(e){
     var element = e.target || e.srcElement;
     {
         clearTimeout(detailoutId);
-        
+
         element.querySelector(".video__content__img").style.opacity=1;
         element.querySelector(".video__content__video").style.opacity=0;
-        element.querySelector(".video__content__img").style.height="100%"; 
+        element.querySelector(".video__content__img").style.height="100%";
         element.querySelector(".video__content__video").style.height="100%";
         element.querySelector(".Videos__video__content").classList.remove("videoScale");
-        
+
         setTimeout(()=>{
 
             element.querySelector(".video__content__img").style.display="block";
@@ -584,14 +704,14 @@ function mouseleaveDetailVideo(e){
 function sumOfArray(numbers)
 {
     numbers.forEach(
-    function sumElement(element)
-    {
-        element.addEventListener("mouseenter",mouseenterDetailVideo)
-        element.addEventListener("mouseleave", mouseleaveDetailVideo);
-    });
-    
+        function sumElement(element)
+        {
+            element.addEventListener("mouseenter",mouseenterDetailVideo)
+            element.addEventListener("mouseleave", mouseleaveDetailVideo);
+        });
+
 }
-  
+
 
 //prev and next
 
@@ -604,10 +724,10 @@ function checkPrevAndNext(index){
         if(check[index]==0)
         {
             prevs[index].style.display='none';
-            
+
         }
         else if(check[index]==5){
-            
+
             nexts[index].style.display='none';
         }
         else{
@@ -622,65 +742,65 @@ function checkPrevAndNext(index){
 }
 function eventforclickprev(){
     prevs.forEach(function(prev, index, prevs) {
-    // code to be executed for each element
-    prev.addEventListener('click',()=>{
-        
-        var videoAll=nexts[index].parentElement.querySelectorAll('.VideoList__Videos');
-        check[index] -=1;
-    
-        videoAll.forEach((element
-        )=>{
-            element.style.transform='translateX(-'+500*check[index]+'%)';
-            
-            if(index+1==(check[index]+1)*5+6){
-                element.querySelector('.Videos__video').classList.remove("Video__final");
-                element.querySelector('.Videos__video').addEventListener('mouseenter',mouseenterDetailVideo);
-                element.querySelector('.Videos__video').addEventListener('mouseleave',mouseleaveDetailVideo);
-            }
-            else if(index+1==check[index]*5+6)
-            {
-                element.querySelector('.Videos__video').classList.add("Video__final");
-                element.querySelector('.Videos__video').removeEventListener('mouseenter',mouseenterDetailVideo);
-                element.querySelector('.Videos__video').removeEventListener('mouseleave',mouseleaveDetailVideo);
-            }
-            else if(index+1==check[index]*5)
-            {
-                element.querySelector('.Videos__video').classList.add("Video__first")
-                element.querySelector('.Videos__video').removeEventListener('mouseenter',mouseenterDetailVideo);
-                element.querySelector('.Videos__video').removeEventListener('mouseleave',mouseleaveDetailVideo);
-            }
-            else if(index+1==(check[index]+1)*5)
-            {
-                element.querySelector('.Videos__video').classList.remove("Video__first");
-                element.querySelector('.Videos__video').addEventListener('mouseenter',mouseenterDetailVideo);
-                element.querySelector('.Videos__video').addEventListener('mouseleave',mouseleaveDetailVideo);
-            }
-            if(check[index]==0)
-            {
-                if(index+1==check[index]*5)
+        // code to be executed for each element
+        prev.addEventListener('click',()=>{
+
+            var videoAll=nexts[index].parentElement.querySelectorAll('.VideoList__Videos');
+            check[index] -=1;
+
+            videoAll.forEach((element
+            )=>{
+                element.style.transform='translateX(-'+500*check[index]+'%)';
+
+                if(index+1==(check[index]+1)*5+6){
+                    element.querySelector('.Videos__video').classList.remove("Video__final");
+                    element.querySelector('.Videos__video').addEventListener('mouseenter',mouseenterDetailVideo);
+                    element.querySelector('.Videos__video').addEventListener('mouseleave',mouseleaveDetailVideo);
+                }
+                else if(index+1==check[index]*5+6)
+                {
+                    element.querySelector('.Videos__video').classList.add("Video__final");
+                    element.querySelector('.Videos__video').removeEventListener('mouseenter',mouseenterDetailVideo);
+                    element.querySelector('.Videos__video').removeEventListener('mouseleave',mouseleaveDetailVideo);
+                }
+                else if(index+1==check[index]*5)
+                {
+                    element.querySelector('.Videos__video').classList.add("Video__first")
+                    element.querySelector('.Videos__video').removeEventListener('mouseenter',mouseenterDetailVideo);
+                    element.querySelector('.Videos__video').removeEventListener('mouseleave',mouseleaveDetailVideo);
+                }
+                else if(index+1==(check[index]+1)*5)
                 {
                     element.querySelector('.Videos__video').classList.remove("Video__first");
                     element.querySelector('.Videos__video').addEventListener('mouseenter',mouseenterDetailVideo);
                     element.querySelector('.Videos__video').addEventListener('mouseleave',mouseleaveDetailVideo);
                 }
-            }
-        });
-        
-        
-        checkPrevAndNext(index);
-        
-       
-        
-    }) 
+                if(check[index]==0)
+                {
+                    if(index+1==check[index]*5)
+                    {
+                        element.querySelector('.Videos__video').classList.remove("Video__first");
+                        element.querySelector('.Videos__video').addEventListener('mouseenter',mouseenterDetailVideo);
+                        element.querySelector('.Videos__video').addEventListener('mouseleave',mouseleaveDetailVideo);
+                    }
+                }
+            });
+
+
+            checkPrevAndNext(index);
+
+
+
+        })
     });
 }
 function eventforclicknext(){
     nexts.forEach(function(next, index, nexts) {
 
         next.addEventListener('click',(element) => {
-        
+
             var videoAll=next.parentElement.querySelectorAll('.VideoList__Videos');
-            
+
             check[index] +=1;
 
             videoAll.forEach((element)=>{
@@ -722,7 +842,7 @@ function eventforclicknext(){
 
             });
             checkPrevAndNext(index);
-        
-        }) 
+
+        })
     });
 }

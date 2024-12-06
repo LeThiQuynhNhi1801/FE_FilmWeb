@@ -74,7 +74,7 @@
 
 </body>
 <script>
-    const domain = "http://localhost:8080"
+    const domain = "http://127.0.0.1:8080";
 
     if (localStorage.getItem("Token")) {
         window.location = "/Admin/Home";
@@ -175,7 +175,7 @@
             password: passwordInput.value
         }
         postData = JSON.stringify(userInfo)
-        xhttp.open("POST", "/auth", false);
+        xhttp.open("POST", domain +"/auth", false);
         xhttp.setRequestHeader("Content-type", "application/json")
         xhttp.send(postData)
     }

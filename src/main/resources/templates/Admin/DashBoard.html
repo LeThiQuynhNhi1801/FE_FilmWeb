@@ -93,6 +93,7 @@
         
     </div>
     <script>
+        const domain = "http://127.0.0.1:8080";
          function CheckAdmin(){
              const xhttp = new XMLHttpRequest();
                 xhttp.onload = function()
@@ -120,7 +121,7 @@
                     }
                 }
 
-                xhttp.open("GET", "/user",false);
+                xhttp.open("GET", domain+"/user",false);
 
                 xhttp.setRequestHeader("Content-type","application/json")
                 token = localStorage.getItem("Token");
@@ -186,7 +187,7 @@
                 }
             }         
             //khai báo phương thức và đường dẫn để request
-            xhttp.open("GET", "/ApiV1/ChapterHotFromDaytoDay?fromDay="+fromDay+"&toDay="+toDay,false);
+            xhttp.open("GET", domain+"/ApiV1/ChapterHotFromDaytoDay?fromDay="+fromDay+"&toDay="+toDay,false);
             //định dạng gửi đi787
             xhttp.setRequestHeader("Content-type","application/json")
             token = localStorage.getItem("Token");
